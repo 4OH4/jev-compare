@@ -1,0 +1,10 @@
+{
+  "dataset": "ag_news",
+  "task": "Classify the news article by its main topic. Choose the single topic that best describes the article.",
+  "labels": {
+    "World": "International news: politics, government, conflicts, diplomacy and events in or between countries.",
+    "Sports": "Sport: matches, players, teams, tournaments, results and transfers.",
+    "Business": "Business and economics: companies, markets, earnings, trade, prices, jobs and finance.",
+    "Sci/Tech": "Science and technology: research, space, health science, computing, the internet, software, gadgets and telecoms."
+  }
+}

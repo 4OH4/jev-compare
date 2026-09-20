@@ -1,0 +1,47 @@
+{
+  "checked": "2026-09-20",
+  "note": "Model IDs and list prices are inputs to the benchmark. On this date the OpenAI ID is the newest mini model and the Gemini ID the newest Flash model in each provider's live model list. Prices are US dollars per million tokens, taken from the providers' public pricing pages. Cached-input prices apply to tokens served from the provider's prompt cache. Anthropic also charges cache_write_per_mtok (5-minute cache) for tokens written to it. Jev's cost comes from the gateway's marketCost field, not from this file.",
+  "models": {
+    "jev": {
+      "provider": "jev",
+      "label": "Jev",
+      "model_id": "typesafe-ai/jev",
+      "requests_per_minute": 27,
+      "rate_limit_note": "The gateway answers 429 with x-ratelimit-limit-requests: 30 (and 250,000 tokens) a minute, seen on 2026-09-20. Requests are paced at 27 a minute to stay under it."
+    },
+    "haiku": {
+      "provider": "anthropic",
+      "label": "Claude Haiku 4.5",
+      "model_id": "claude-haiku-4-5-20251001",
+      "env_key": "ANTHROPIC_API_KEY",
+      "input_per_mtok": 1.0,
+      "output_per_mtok": 5.0,
+      "cached_input_per_mtok": 0.1,
+      "cache_write_per_mtok": 1.25,
+      "price_source": "https://platform.claude.com/docs/en/about-claude/pricing",
+      "params": {"extra_body": {"temperature": 0}}
+    },
+    "openai": {
+      "provider": "openai",
+      "label": "OpenAI small model",
+      "model_id": "gpt-5.4-mini",
+      "env_key": "OPENAI_API_KEY",
+      "input_per_mtok": 0.75,
+      "output_per_mtok": 4.5,
+      "cached_input_per_mtok": 0.075,
+      "price_source": "https://developers.openai.com/api/docs/models/gpt-5.4-mini",
+      "params": {"reasoning": {"effort": "none"}}
+    },
+    "gemini": {
+      "provider": "google",
+      "label": "Gemini Flash model",
+      "model_id": "gemini-3.8-flash",
+      "env_key": "GEMINI_API_KEY",
+      "input_per_mtok": 0.75,
+      "output_per_mtok": 3.75,
+      "cached_input_per_mtok": 0.075,
+      "price_source": "https://ai.google.dev/gemini-api/docs/pricing",
+      "params": {"temperature": 0, "thinking_config": {"thinking_budget": 0}}
+    }
+  }
+}

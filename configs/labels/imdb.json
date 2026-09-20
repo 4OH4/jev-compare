@@ -1,0 +1,8 @@
+{
+  "dataset": "imdb",
+  "task": "Classify the movie review by the sentiment the reviewer expresses about the film. Choose the single sentiment that best describes the review as a whole.",
+  "labels": {
+    "negative": "The reviewer dislikes the film overall and would not recommend it.",
+    "positive": "The reviewer likes the film overall and would recommend it."
+  }
+}
