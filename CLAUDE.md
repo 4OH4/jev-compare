@@ -34,3 +34,25 @@ notebook, 2 benchmark, 3 calibration) and don't start a phase until asked.
 ## Secrets
 Keys live in `.env` (gitignored); names go in `.env.example`. Never commit real secrets, and
 don't print keys in notebook output.
+
+## Writing style
+
+Applies to notebook prose, READMEs, docstrings, comments and anything else a person will read.
+
+- Write plain, ordinary British English, as a careful engineer would in a report. Use the simplest
+  word that is accurate. Avoid US tech-industry slang and marketing phrasing (e.g. "primitives",
+  "rungs", "under the hood", "punchy", "landscape", "deep dive", "unlock", "collapse" for a
+  drop in a value, "breaks" for "gives poor results").
+- Don't use analogies or metaphors where a direct description works. If a metaphor is
+  really needed, say what it stands for.
+- Don't narrate or enumerate what the text is about ("six of these, two of those", "three
+  hand-picked examples", "n=8"). Describe the thing itself: "the same bug reports", "a few
+  tickets". Give a count only where it is the result being reported, or where the reader needs it
+  to judge how far to trust the result, and then state it once.
+- Use one name for one thing. Keep the terms the API and the plan use for code and field names
+  (`boolean`, `choice`, `score`, `confidence`), and explain them in ordinary words the first time.
+- Report results as they are, including negative and mixed ones. Don't dress up a weak result,
+  and don't use first-person hedging such as "I'd rather show that".
+- Prefer short sentences. Put the finding first and the caveat second.
+- Before finishing a notebook or document, reread the prose once for the points above.
+

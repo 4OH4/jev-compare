@@ -27,6 +27,9 @@ target-version = "py312"
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM"]
 
+[tool.ruff.lint.per-file-ignores]
+"*.ipynb" = ["E501"]  # long sample-text strings in data cells
+
 [dependency-groups]
 dev = [
     "ipykernel>=7.3.0",
