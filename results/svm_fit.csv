@@ -1,0 +1,4 @@
+dataset,n_train,best_C,cv_bal_acc,fit_time_s,predict_ms_per_row,predict_sample_s,n_full_test,bal_acc_full_test,bal_acc_full_test_lo,bal_acc_full_test_hi,source
+banking77,10003,1.0,0.879929,21.415956299984828,0.0154058766277664,,3080,0.8938311688311689,0.884047314709669,0.9046710497591194,rebuilt from the saved output of the run of 2026-09-21 (not written by the notebook)
+ag_news,120000,1.0,0.9257,200.06600869999968,0.0651876578960678,,7600,0.9275,0.921502425553634,0.933504738228882,rebuilt from the saved output of the run of 2026-09-21 (not written by the notebook)
+imdb,25000,10.0,0.91032,162.00024100000155,0.3970498479995876,,25000,0.90684,0.9032358043714032,0.9104139530327612,rebuilt from the saved output of the run of 2026-09-21 (not written by the notebook)

@@ -1,0 +1,94 @@
+{
+  "run_date": "2026-09-21",
+  "settings": {
+    "N_TEST": 1000,
+    "N_THRESHOLD": 500,
+    "SEED": 0,
+    "WORKERS": 4,
+    "SHOTS": [
+      "zeroshot",
+      "fewshot"
+    ]
+  },
+  "datasets": {
+    "banking77": {
+      "train_sha256": "e8094971aeeedd928711c929355624ad0e3de9ed6a4b05f413e0dc872f3c5425",
+      "test_sha256": "b1c1e65b7fa4bd56488060fadbeb09aa1c84fe0cb86550536a903de3a642152f",
+      "sample_sha256": "ccbe44779bfa4fcb1ccdac2bd5ec274fc97af6ffb9fdff82db4d9e8094dbed21",
+      "git_commit": "e6719ccb590009f7c3834808d77837faa78d5c2e",
+      "git_dirty": true,
+      "code_sha256": "069690afd4da00715d8a3e0675ec676ea035337ddaf489253694355ea66a4b33",
+      "labels_sha256": "a51b8d27f865cb177d15b4f089fe732ed69c0f55fc2d43efaa08dacdfcdbbda3",
+      "models_sha256": "eb481c203d5a58850fe84e66730d60eb0a294da6a0db3181942ce647e27365e0",
+      "packages": {
+        "anthropic": "1.7.0",
+        "openai": "3.16.2",
+        "google-genai": "2.24.0",
+        "httpx": "0.28.1",
+        "scikit-learn": "1.9.1",
+        "pandas": "3.0.6",
+        "numpy": "2.5.3",
+        "datasets": "5.0.1"
+      }
+    },
+    "ag_news": {
+      "train_sha256": "00120800463ece2015d5027262466eadf03ceff9b6cd07027163cd322c9683c2",
+      "test_sha256": "c87e64bbf94b47577c37b60cb601f28836b99211034f529f76c829b256ab097e",
+      "sample_sha256": "a8956e31039001ef8cc2b649359b94745f73f92f30301b14f4d90da6b1466850",
+      "git_commit": "e6719ccb590009f7c3834808d77837faa78d5c2e",
+      "git_dirty": true,
+      "code_sha256": "069690afd4da00715d8a3e0675ec676ea035337ddaf489253694355ea66a4b33",
+      "labels_sha256": "488680150ca182e04c1e8705a925b171f87eada05367289e3158927a9b99f469",
+      "models_sha256": "eb481c203d5a58850fe84e66730d60eb0a294da6a0db3181942ce647e27365e0",
+      "packages": {
+        "anthropic": "1.7.0",
+        "openai": "3.16.2",
+        "google-genai": "2.24.0",
+        "httpx": "0.28.1",
+        "scikit-learn": "1.9.1",
+        "pandas": "3.0.6",
+        "numpy": "2.5.3",
+        "datasets": "5.0.1"
+      }
+    },
+    "imdb": {
+      "train_sha256": "6d366a094d23c24c5bbefafe7f465893e2cf44d58d69bc64973e4c23cff893ad",
+      "test_sha256": "7fc66f8c2e4ed6bb8a53b0e053cfc284eb0ecf64884a55efec0053d95b97bde9",
+      "sample_sha256": "1339485b4f241f6ef6fea47b594f490e349877d2728d868e4827c249d5fb3f5d",
+      "git_commit": "e6719ccb590009f7c3834808d77837faa78d5c2e",
+      "git_dirty": true,
+      "code_sha256": "069690afd4da00715d8a3e0675ec676ea035337ddaf489253694355ea66a4b33",
+      "labels_sha256": "bc4a5be62e3dde1c34221619940392d55a478695e32f98906f44efa1fac78cbe",
+      "models_sha256": "eb481c203d5a58850fe84e66730d60eb0a294da6a0db3181942ce647e27365e0",
+      "packages": {
+        "anthropic": "1.7.0",
+        "openai": "3.16.2",
+        "google-genai": "2.24.0",
+        "httpx": "0.28.1",
+        "scikit-learn": "1.9.1",
+        "pandas": "3.0.6",
+        "numpy": "2.5.3",
+        "datasets": "5.0.1"
+      }
+    }
+  },
+  "models": {
+    "jev": {
+      "ran": true,
+      "reason": null
+    },
+    "haiku": {
+      "ran": true,
+      "reason": null
+    },
+    "openai": {
+      "ran": true,
+      "reason": null
+    },
+    "gemini": {
+      "ran": true,
+      "reason": null
+    }
+  },
+  "backfilled": "models: added after the run, from models_used.csv"
+}

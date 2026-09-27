@@ -4,15 +4,16 @@
 Compare the "Jev" model against frontier LLMs (Claude Haiku 4.5, a small OpenAI model, a Gemini
 Flash-class model) and a TF-IDF + linear SVM on zero-shot / few-shot text classification
 (Banking77, AG News, IMDb), then analyse calibration. **The full plan is in
-`jev-experiment-plan.md`; read it, and the open issues in `plan-review.md`, before starting any
-phase.** Work in phase order (1 mechanics
+`jev-experiment-plan.md`; read it before starting any phase.** Work in phase order (1 mechanics
 notebook, 2 benchmark, 3 calibration) and don't start a phase until asked.
 
 ## Tooling
 - uv manages deps: `uv add`, `uv sync`, `uv run`. Never bare `pip`; don't activate the venv.
 - Lint/format: `uv run ruff check .` and `uv run ruff format .`. No test suite yet.
 - Notebooks are committed WITH outputs, and must run top to bottom (`uv run jupyter nbconvert
-  --execute --to notebook --inplace <nb>`).
+  --execute --to notebook --inplace <nb>`). For notebook 02 add
+  `--ExecutePreprocessor.timeout=-1`: its run cell takes far longer than nbconvert's default
+  30-second limit per cell.
 
 ## Layout
 - `src/jev_compare/` shared code (dataset loading, sampling, Jev client, LLM clients); reused by

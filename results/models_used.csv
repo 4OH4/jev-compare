@@ -1,0 +1,5 @@
+model,model_id_requested,model_id_returned,ran,not_run_reason,run_date,params,requests_per_minute,input_usd_per_mtok,cached_input_usd_per_mtok,cache_write_usd_per_mtok,output_usd_per_mtok,price_source
+jev,typesafe-ai/jev,typesafe-ai/jev,True,,2026-09-21,{},27.0,,,,,
+haiku,claude-haiku-4-5-20251001,claude-haiku-4-5-20251001,True,,2026-09-21,"{""extra_body"": {""temperature"": 0}}",,1.0,0.1,1.25,5.0,https://platform.claude.com/docs/en/about-claude/pricing
+openai,gpt-5.4-mini,gpt-5.4-mini-2026-03-17,True,,2026-09-21,"{""reasoning"": {""effort"": ""none""}}",,0.75,0.075,,4.5,https://developers.openai.com/api/docs/models/gpt-5.4-mini
+gemini,gemini-3.8-flash,gemini-3.8-flash,True,,2026-09-21,"{""temperature"": 0, ""thinking_config"": {""thinking_budget"": 0}}",,0.75,0.075,,3.75,https://ai.google.dev/gemini-api/docs/pricing
