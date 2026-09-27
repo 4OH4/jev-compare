@@ -164,23 +164,29 @@ def plot_reliability(
     edges: tuple[float, ...],
     subtitle: str,
     path: Path | None = None,
+    title: str = "Reliability: stated confidence against accuracy",
+    whiskers: bool | None = None,
+    min_rows: int = 10,
 ):
     """Reliability diagram with the bucket counts beneath it.
 
     ``tables`` maps a model key to the output of ``calibration.reliability_table``. Each model is a
     line through its non-empty buckets, at the bucket's mean confidence, with the marker area in
-    proportion to the number of rows. Whiskers are 95% Wilson intervals. A point on the dotted
-    diagonal is perfectly calibrated. The lower panel gives the counts, because a bucket with few
-    rows says little.
+    proportion to the number of rows. Whiskers are 95% Wilson intervals, drawn by default for two
+    models or fewer (more would overlap; the intervals are in the tables). A point on the dotted
+    diagonal is perfectly calibrated. A bucket with fewer than ``min_rows`` rows says little, so
+    it is drawn as a hollow point and left out of the line. The lower panel gives the counts.
     """
+    if whiskers is None:
+        whiskers = len(tables) <= 2
     fig, (ax, cnt) = plt.subplots(
         2, 1, figsize=(7.4, 7.2), dpi=150, gridspec_kw={"height_ratios": [3.4, 1]}, sharex=True
     )
     fig.patch.set_facecolor(SURFACE)
     _style_axes(ax, "Accuracy in the bucket")
     _style_axes(cnt, "Rows")
-    ax.plot([0, 1], [0, 1], color=INK_MUTED, linewidth=1, linestyle=(0, (2, 3)), zorder=2)
-    ax.text(0.62, 0.52, "Perfect calibration", color=INK_MUTED, fontsize=8)
+    ax.plot([0, 1], [0, 1], color=INK_MUTED, linewidth=1, linestyle=(0, (2, 3)), zorder=2,
+            label="Perfect calibration")  # fmt: skip
 
     n_max = max(int(t.n.max()) for t in tables.values())
     keys = list(tables)
@@ -188,28 +194,39 @@ def plot_reliability(
         t = tables[key]
         t = t[t.n > 0]
         colour = SLOTS[key]
-        ax.plot(t.mean_confidence, t.accuracy, color=colour, linewidth=2, zorder=3)
-        ax.errorbar(
-            t.mean_confidence,
-            t.accuracy,
-            yerr=[t.accuracy - t.accuracy_lo, t.accuracy_hi - t.accuracy],
-            fmt="none",
-            ecolor=colour,
-            elinewidth=1,
-            capsize=2,
-            alpha=0.6,
-            zorder=3,
-        )
+        solid, sparse = t[t.n >= min_rows], t[t.n < min_rows]
+        ax.plot(solid.mean_confidence, solid.accuracy, color=colour, linewidth=2, zorder=3)
+        if whiskers:
+            ax.errorbar(
+                t.mean_confidence,
+                t.accuracy,
+                yerr=[t.accuracy - t.accuracy_lo, t.accuracy_hi - t.accuracy],
+                fmt="none",
+                ecolor=colour,
+                elinewidth=1,
+                capsize=2,
+                alpha=0.6,
+                zorder=3,
+            )
         ax.scatter(
-            t.mean_confidence,
-            t.accuracy,
-            s=30 + 220 * t.n / n_max,
+            solid.mean_confidence,
+            solid.accuracy,
+            s=30 + 220 * solid.n / n_max,
             color=colour,
             edgecolor=SURFACE,
             linewidth=2,
             zorder=4,
-            label=NAMES[key],
         )
+        ax.scatter(
+            sparse.mean_confidence,
+            sparse.accuracy,
+            s=30,
+            facecolor=SURFACE,
+            edgecolor=colour,
+            linewidth=1.3,
+            zorder=4,
+        )
+        ax.plot([], [], color=colour, linewidth=2, marker="o", markersize=7, label=NAMES[key])
         full = tables[key]
         centre = (full.lo + full.hi) / 2
         width = (full.hi - full.lo) / (len(keys) + 1)
@@ -222,8 +239,7 @@ def plot_reliability(
     cnt.set_xlabel("Stated confidence", color=INK_2, fontsize=10)
     cnt.set_ylim(0, None)
     ax.legend(loc="upper left", frameon=False, fontsize=9, labelcolor=INK_2)
-    fig.text(0.1, 0.965, "Reliability: stated confidence against accuracy", color=INK,
-             fontsize=14, weight="bold", ha="left")  # fmt: skip
+    fig.text(0.1, 0.965, title, color=INK, fontsize=14, weight="bold", ha="left")
     fig.text(0.1, 0.935, subtitle, color=INK_2, fontsize=9, ha="left")
     fig.subplots_adjust(left=0.1, right=0.97, top=0.9, bottom=0.08, hspace=0.12)
     if path is not None:
@@ -235,14 +251,18 @@ def plot_gated(
     curves: dict[str, pd.DataFrame],
     subtitle: str,
     path: Path | None = None,
+    title: str = "What a confidence threshold does",
+    bands: bool | None = None,
 ):
     """Accuracy and coverage as the confidence threshold rises, one panel each.
 
     ``curves`` maps a model key to the output of ``calibration.gated_curve``. Accuracy is on the
     rows at or above the threshold, with a shaded 95% Wilson interval. Coverage is the share of all
     rows that are at or above it. The two are separate panels because they have different scales
-    and meanings.
+    and meanings. The bands are drawn by default for two models or fewer (more would overlap).
     """
+    if bands is None:
+        bands = len(curves) <= 2
     fig, (acc, cov) = plt.subplots(1, 2, figsize=(11, 4.8), dpi=150, sharex=True)
     fig.patch.set_facecolor(SURFACE)
     _style_axes(acc, "Accuracy of the answers kept")
@@ -250,8 +270,9 @@ def plot_gated(
     for key, c in curves.items():
         colour = SLOTS[key]
         shown = c[c.n_kept > 0]
-        acc.fill_between(shown.threshold, shown.accuracy_lo, shown.accuracy_hi, color=colour,
-                         alpha=0.15, linewidth=0, zorder=2)  # fmt: skip
+        if bands:
+            acc.fill_between(shown.threshold, shown.accuracy_lo, shown.accuracy_hi, color=colour,
+                             alpha=0.15, linewidth=0, zorder=2)  # fmt: skip
         acc.plot(shown.threshold, shown.accuracy, color=colour, linewidth=2, zorder=3,
                  label=NAMES[key])  # fmt: skip
         cov.plot(c.threshold, c.coverage, color=colour, linewidth=2, zorder=3, label=NAMES[key])
@@ -260,8 +281,7 @@ def plot_gated(
     for ax in (acc, cov):
         ax.set_xlabel("Confidence threshold", color=INK_2, fontsize=10)
     cov.legend(loc="lower left", frameon=False, fontsize=9, labelcolor=INK_2)
-    fig.text(0.06, 0.955, "What a confidence threshold does", color=INK, fontsize=14,
-             weight="bold", ha="left")  # fmt: skip
+    fig.text(0.06, 0.955, title, color=INK, fontsize=14, weight="bold", ha="left")
     fig.text(0.06, 0.915, subtitle, color=INK_2, fontsize=9, ha="left")
     fig.subplots_adjust(left=0.06, right=0.985, top=0.84, bottom=0.14, wspace=0.16)
     if path is not None:
