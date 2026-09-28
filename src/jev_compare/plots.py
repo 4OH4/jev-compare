@@ -7,7 +7,6 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-from matplotlib.colors import to_rgb
 from matplotlib.patches import Patch
 
 # Light-mode ink and surface, and the first five categorical slots of the default palette.
@@ -35,10 +34,7 @@ ORDER = ["jev", "haiku", "openai", "gemini", "svm"]
 DATASET_NAMES = {"banking77": "Banking77", "ag_news": "AG News", "imdb": "IMDb"}
 
 
-def _tint(colour: str, amount: float) -> tuple[float, float, float]:
-    """Blend a colour towards the surface. ``amount`` is the share of the colour kept."""
-    c, s = np.array(to_rgb(colour)), np.array(to_rgb(SURFACE))
-    return tuple(amount * c + (1 - amount) * s)
+SHOT_NAMES = {"zeroshot": "Zero-shot", "fewshot": "Few-shot", "trained": "Trained"}
 
 
 def plot_balanced_accuracy(
@@ -50,58 +46,75 @@ def plot_balanced_accuracy(
 ):
     """Vertical bars of balanced accuracy, one group per dataset, one bar per model and condition.
 
-    Colour identifies the model. Within a model, few-shot is the full colour and zero-shot is a
-    lighter tint. The SVM is trained once, so it has a single bar. A model that was not run leaves
-    its slot empty, so positions do not move between runs.
+    Within each dataset the bars are split by condition: zero-shot, then few-shot, then the trained
+    SVM. The condition is named on the axis under its bars. Colour identifies the model only. A
+    model that was not run leaves its slot empty, so positions do not move between runs.
     """
     raw = summary[summary.panel == "raw"]
-    slots = [(m, s) for m in ORDER for s in (("trained",) if m == "svm" else shots)]
+    prompted = [m for m in ORDER if m != "svm"]
+    subgroups = [(shot, prompted) for shot in shots] + [("trained", ["svm"])]
     n_test = int(raw.n.max())
 
     fig, ax = plt.subplots(figsize=(11, 5.4), dpi=150)
     fig.patch.set_facecolor(SURFACE)
     ax.set_facecolor(SURFACE)
 
-    width, group_gap = 0.8, 1.6
-    pitch = len(slots) + group_gap
-    centres = []
+    # Bars sit one unit apart. Condition sub-groups are separated by a small gap, datasets by a
+    # larger one, so the spacing alone shows which bars belong together.
+    width, sub_gap, group_gap = 0.8, 0.7, 2.4
+    x = 0.0
+    sub_ticks, sub_labels, group_ticks = [], [], []
     for g, ds in enumerate(datasets):
-        left = g * pitch
-        centres.append(left + (len(slots) - 1) / 2)
-        for i, (model, shot) in enumerate(slots):
-            hit = raw[(raw.dataset == ds) & (raw.model == model) & (raw.shot == shot)]
-            if hit.empty:
-                continue
-            colour = SLOTS[model] if shot in ("fewshot", "trained") else _tint(SLOTS[model], 0.5)
-            height = hit.bal_acc.iloc[0]
-            ax.bar(left + i, height, width, color=colour, linewidth=0, zorder=3)
-            has_interval = {"bal_acc_lo", "bal_acc_hi"} <= set(hit.columns)
-            lo = hit.bal_acc_lo.iloc[0] if has_interval else np.nan
-            hi = hit.bal_acc_hi.iloc[0] if has_interval else np.nan
-            if pd.notna(lo) and pd.notna(hi):
-                ax.errorbar(
-                    left + i,
-                    height,
-                    yerr=[[height - lo], [hi - height]],
-                    fmt="none",
-                    ecolor=INK_2,
-                    elinewidth=1,
-                    capsize=2,
-                    zorder=4,
-                )
+        if g:
+            x += group_gap - sub_gap
+        group_left = x
+        for shot, models in subgroups:
+            sub_left = x
+            for model in models:
+                hit = raw[(raw.dataset == ds) & (raw.model == model) & (raw.shot == shot)]
+                if not hit.empty:
+                    height = hit.bal_acc.iloc[0]
+                    ax.bar(x, height, width, color=SLOTS[model], linewidth=0, zorder=3)
+                    has_interval = {"bal_acc_lo", "bal_acc_hi"} <= set(hit.columns)
+                    lo = hit.bal_acc_lo.iloc[0] if has_interval else np.nan
+                    hi = hit.bal_acc_hi.iloc[0] if has_interval else np.nan
+                    if pd.notna(lo) and pd.notna(hi):
+                        ax.errorbar(
+                            x,
+                            height,
+                            yerr=[[height - lo], [hi - height]],
+                            fmt="none",
+                            ecolor=INK_2,
+                            elinewidth=1,
+                            capsize=2,
+                            zorder=4,
+                        )
+                x += 1
+            sub_ticks.append((sub_left + x - 1) / 2)
+            sub_labels.append(SHOT_NAMES[shot])
+            x += sub_gap
+        group_ticks.append((group_left + x - sub_gap - 1) / 2)
+    right = x - sub_gap - 1
 
-    ax.set_xticks(centres)
-    ax.set_xticklabels(
+    # Two rows of labels under the bars: the condition, then the dataset.
+    ax.set_xticks(sub_ticks)
+    ax.set_xticklabels(sub_labels, color=INK_2, fontsize=9)
+    ax.tick_params(axis="x", length=0, pad=6)
+    datasets_axis = ax.secondary_xaxis("bottom")
+    datasets_axis.set_xticks(group_ticks)
+    datasets_axis.set_xticklabels(
         [f"{DATASET_NAMES.get(d, d)}\n{n_classes[d]} classes" for d in datasets],
         color=INK,
         fontsize=11,
     )
-    ax.tick_params(axis="x", length=0, pad=8)
+    datasets_axis.tick_params(axis="x", length=0, pad=24)
+    datasets_axis.spines["bottom"].set_visible(False)
+
     ax.set_ylim(0, 1.0)
     ax.set_yticks(np.arange(0, 1.01, 0.2))
     ax.set_yticklabels([f"{v:.1f}" for v in np.arange(0, 1.01, 0.2)], color=INK_MUTED, fontsize=9)
     ax.tick_params(axis="y", length=0)
-    ax.set_xlim(-1, (len(datasets) - 1) * pitch + len(slots))
+    ax.set_xlim(-1, right + 1)
     ax.yaxis.grid(True, color=GRID, linewidth=1, zorder=0)
     ax.set_axisbelow(True)
     for side in ("top", "right", "left"):
@@ -109,16 +122,10 @@ def plot_balanced_accuracy(
     ax.spines["bottom"].set_color(BASELINE)
     ax.set_ylabel("Balanced accuracy", color=INK_2, fontsize=10)
 
-    # Legend: model identity (colour), then the shot condition (full colour or tint).
-    model_handles = [Patch(facecolor=SLOTS[m], label=NAMES[m]) for m in ORDER]
-    shot_handles = [
-        Patch(facecolor=INK_MUTED, label="Few-shot (or trained)"),
-        Patch(facecolor=_tint(INK_MUTED, 0.5), label="Zero-shot"),
-    ]
     fig.legend(
-        handles=model_handles + shot_handles,
+        handles=[Patch(facecolor=SLOTS[m], label=NAMES[m]) for m in ORDER],
         loc="lower center",
-        ncol=7,
+        ncol=len(ORDER),
         frameon=False,
         fontsize=9,
         labelcolor=INK_2,
@@ -129,18 +136,18 @@ def plot_balanced_accuracy(
     fig.text(
         0.075,
         0.955,
-        "Balanced accuracy by model and dataset",
+        "Comparing Jev, frontier LLMs and TF-IDF/SVM for text classification tasks",
         color=INK,
         fontsize=14,
         weight="bold",
         ha="left",
     )
     subtitle = (
-        f"Official test split, {n_test} sampled rows per dataset, one run per condition. "
-        "Bars: answered rows. Whiskers: 95% bootstrap interval."
+        f"Balanced accuracy by model and dataset, {n_test} sampled rows per dataset, "
+        "one run per condition. Whiskers: 95% bootstrap interval."
     )
     fig.text(0.075, 0.915, subtitle, color=INK_2, fontsize=9, ha="left")
-    fig.subplots_adjust(left=0.075, right=0.985, top=0.86, bottom=0.2)
+    fig.subplots_adjust(left=0.075, right=0.985, top=0.86, bottom=0.22)
 
     if path is not None:
         fig.savefig(path, facecolor=SURFACE)

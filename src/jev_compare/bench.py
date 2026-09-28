@@ -1,4 +1,4 @@
-"""Benchmark runner and scoring, shared by the Phase 2 notebook (and reusable by Phase 3).
+"""Benchmark runner and scoring, used by the benchmark (02) and calibration (03) notebooks.
 
 Failure policy:
 

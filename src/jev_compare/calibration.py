@@ -1,4 +1,4 @@
-"""Calibration measures for the Phase 3 notebook.
+"""Calibration measures for the calibration notebook (03).
 
 All functions take one confidence per row (a number from 0 to 1) and whether the row's label was
 right. The confidence is that of the label the model chose, so the measures are top-label
@@ -20,7 +20,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-# The plan's buckets, which include one below 0.5 so that low-confidence answers are not dropped.
+# Buckets of 0.1 from 0.5 up, and one below 0.5 so that low-confidence answers are not dropped.
 BIN_EDGES = (0.0, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0)
 Z95 = 1.959964
 N_BOOT = 2000
